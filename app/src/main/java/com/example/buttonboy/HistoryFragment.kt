@@ -14,6 +14,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.OutputStreamWriter
+import com.google.android.material.snackbar.Snackbar
+import androidx.recyclerview.widget.ItemTouchHelper
 
 class HistoryFragment : Fragment() {
 
@@ -35,10 +37,43 @@ class HistoryFragment : Fragment() {
         recyclerView.adapter = historyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        // Create the swipe-to-delete callback
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+            0, // not used for drag & drop
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // enable swipe left and right
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false // not used
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val eventToDelete = historyAdapter.getEventAt(position)
+                viewModel.deleteEvent(eventToDelete)
+
+                // Show Snackbar with Undo action
+                Snackbar.make(view, "Event deleted", Snackbar.LENGTH_LONG).apply {
+                    setAction("UNDO") {
+                        viewModel.insertEvent(eventToDelete)
+                    }
+                    show()
+                }
+            }
+        }
+
+        // Attach the callback to the RecyclerView
+        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView)
+
         // Observe the LiveData from the ViewModel
-        viewModel.allEvents.observe(viewLifecycleOwner, Observer { events ->
-            events?.let { historyAdapter.setData(it) }
-        })
+        viewModel.allEvents.observe(viewLifecycleOwner) { events -> // Cleaned up redundant SAM
+            events?.let {
+                historyAdapter.setData(it)
+            }
+        }
 
         // Setup Export button
         exportButton.setOnClickListener {

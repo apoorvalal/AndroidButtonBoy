@@ -26,6 +26,10 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.EventViewHolder>() {
 
     override fun getItemCount() = events.size
 
+    fun getEventAt(position: Int): Event {
+        return events[position]
+    }
+
     fun setData(events: List<Event>) {
         this.events = events
         notifyDataSetChanged()

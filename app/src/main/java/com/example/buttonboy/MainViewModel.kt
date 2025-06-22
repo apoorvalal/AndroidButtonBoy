@@ -20,6 +20,15 @@ class MainViewModel(private val eventDao: EventDao) : ViewModel() {
             eventDao.insert(Event(timestamp = currentTimestamp))
         }
     }
+
+    fun deleteEvent(event: Event) = viewModelScope.launch {
+        eventDao.delete(event)
+    }
+
+    // We need this for the "Undo" action
+    fun insertEvent(event: Event) = viewModelScope.launch {
+        eventDao.insert(event)
+    }
 }
 
 // This "Factory" is boilerplate code to allow us to pass the DAO into our ViewModel

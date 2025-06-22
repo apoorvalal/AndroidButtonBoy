@@ -3,8 +3,7 @@ package com.example.buttonboy
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,18 +12,26 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val viewPager: ViewPager2 = findViewById(R.id.viewPager)
-        val tabLayout: TabLayout = findViewById(R.id.tabLayout)
+        val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
 
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
 
-        // Link the TabLayout and the ViewPager2
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> "Log"
-                1 -> "History"
-                else -> null
+        // Link BottomNav with ViewPager
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_log -> viewPager.currentItem = 0
+                R.id.nav_history -> viewPager.currentItem = 1
             }
-        }.attach()
+            true
+        }
+
+        // Link ViewPager with BottomNav (for swipe gestures)
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                bottomNav.menu.getItem(position).isChecked = true
+            }
+        })
     }
 }
