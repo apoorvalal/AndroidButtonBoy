@@ -11,7 +11,16 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.EventViewHolder>() {
     private var events = emptyList<Event>()
 
     class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val eventTextView: TextView = itemView.findViewById(R.id.eventTextView)
+        // Update the ViewHolder to find the new TextViews
+        val eventNameTextView: TextView = itemView.findViewById(R.id.eventNameTextView)
+        val eventTimestampTextView: TextView = itemView.findViewById(R.id.eventTimestampTextView)
+    }
+
+    override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
+        val currentEvent = events[position]
+        // Set text for both
+        holder.eventNameTextView.text = currentEvent.eventName
+        holder.eventTimestampTextView.text = currentEvent.timestamp
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
@@ -19,10 +28,6 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.EventViewHolder>() {
         return EventViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
-        val currentEvent = events[position]
-        holder.eventTextView.text = currentEvent.timestamp
-    }
 
     override fun getItemCount() = events.size
 

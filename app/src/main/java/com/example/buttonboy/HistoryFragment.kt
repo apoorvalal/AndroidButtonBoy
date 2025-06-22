@@ -19,9 +19,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 
 class HistoryFragment : Fragment() {
 
+    // In both LogFragment.kt and HistoryFragment.kt
     private val viewModel: MainViewModel by activityViewModels {
-        MainViewModelFactory((requireActivity().application as ButtonBoyApplication).database.eventDao())
+        val database = (requireActivity().application as ButtonBoyApplication).database
+        MainViewModelFactory(database.eventDao(), database.buttonDao()) // Pass both DAOs
     }
+
     private lateinit var historyAdapter: HistoryAdapter
 
     override fun onCreateView(
@@ -104,8 +107,10 @@ class HistoryFragment : Fragment() {
                 resolver.openOutputStream(uri).use { outputStream ->
                     OutputStreamWriter(outputStream).use { writer ->
                         writer.append("id,timestamp\n")
+                        // In exportToCsv() in HistoryFragment.kt
+                        writer.append("id,eventName,timestamp\n") // Add new column header
                         eventsToExport.forEach { event ->
-                            writer.append("${event.id},\"${event.timestamp}\"\n")
+                            writer.append("${event.id},\"${event.eventName}\",\"${event.timestamp}\"\n") // Add new data field
                         }
                         writer.flush()
                     }

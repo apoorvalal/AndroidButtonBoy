@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Event(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val eventName: String, // NEW FIELD
     val timestamp: String
 )
